@@ -2,7 +2,7 @@ name: OpenLogin - Google Login
 
 on:
   schedule:
-    - cron: "*/15 * * * *"
+    - cron: "*/5 * * * *"
   workflow_dispatch:
 
 env:
@@ -58,7 +58,7 @@ jobs:
       - id: download-state
         name: Download remote browser snapshots
         if: steps.configure-aws.outcome == 'success'
-        run: aws s3 cp s3://torus-e2e-tests/openlogin/login-with-google/ openlogin/login-with-google/ --recursive
+        run: aws s3 cp s3://torus-openlogin/ openlogin/login-with-google/ --recursive
         continue-on-error: true
 
       - id: run-tests
@@ -68,8 +68,8 @@ jobs:
 
       - id: upload-state
         name: Upload logged-in state to S3 on 10:00 UTC+8 everyday
-        if: github.event.schedule == '0 2 * * *' && steps.run-tests.outcome == 'success'
-        run: aws s3 cp openlogin/login-with-google/${{ matrix.browser }}.json s3://torus-e2e-tests/openlogin/login-with-google/
+        if: github.event.schedule == '0 * * * *' && steps.run-tests.outcome == 'success'
+        run: aws s3 cp openlogin/login-with-google/${{ matrix.browser }}.json s3://torus-openlogin/
         continue-on-error: true
 
       - name: Upload test results
